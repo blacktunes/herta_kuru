@@ -299,8 +299,13 @@ const progress = [0, 1];
 
     const wrapperDom = document.getElementById('wrapper')
 
+    let t = Date.now()
     function addBtnEvent() {
         wrapperDom.addEventListener('click', (e) => {
+            const _t = Date.now();
+            if ((_t - t) < 50) return
+            t = _t;
+
             localCount++;
             localCounter.textContent = localCount.toLocaleString('en-US');
             localStorage.setItem('count-v2', localCount);
