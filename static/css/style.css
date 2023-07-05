@@ -40,6 +40,7 @@ body::-webkit-scrollbar {
     z-index: 999;
     opacity: 1;
     transition: opacity 0.5s;
+    cursor: default;
 }
 
 #content {
@@ -97,6 +98,7 @@ body::-webkit-scrollbar {
     color: #fff;
     font-size: 3.5em;
     text-align: center;
+    cursor: default;
 }
 
 #loading {
@@ -107,6 +109,7 @@ body::-webkit-scrollbar {
     height: 100vh;
     background: rgba(0, 0, 0, 0.5);
     transition: width 0.1s;
+    cursor: default;
 }
 
 #language-selector-container {
@@ -311,4 +314,27 @@ body::-webkit-scrollbar {
     box-sizing: border-box;
     font-weight: bold;
     font-size: 1em;
+}
+
+.herta {
+    z-index: -1;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    max-width: 100%;
+    transform: translate3d(100%, 0, 0);
+}
+
+@keyframes herta {
+    from {
+        right: 0;
+        transform: translate3d(100%, 0, 0);
+        opacity: 1;
+    }
+
+    to {
+        right: 100%;
+        transform: translate3d(0, 0, 0);
+    }
+
 }

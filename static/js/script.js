@@ -309,9 +309,9 @@ const progress = [0, 1];
             localCount++;
             localCounter.textContent = localCount.toLocaleString('en-US');
             localStorage.setItem('count-v2', localCount);
+
             triggerRipple(e);
             playKuru();
-            animateHerta();
             refreshDynamicTexts();
         });
     };
@@ -361,39 +361,29 @@ const progress = [0, 1];
 
     function playKuru() {
         audioUrl = getRandomAudioUrl();
-        const audio = new Audio();
+        let audio = new Audio();
         audio.src = audioUrl;
-        audio.play();
-        audio.addEventListener("ended", function () {
-            this.remove();
-        });
+        audio.oncanplay = () => {
+            animateHerta(audio.duration * 1000);
+            audio.play();
+        }
+        audio.onended = () => {
+            audio = null
+        }
     }
 
-    function animateHerta() {
-        let id = null;
+    function animateHerta(time) {
         const random = Math.floor(Math.random() * 2) + 1;
-        const randomSpeed = Math.floor(Math.random() * 20) + 20;
-        const elem = document.createElement('img');
+        let elem = document.createElement('img');
         elem.src = cacheStaticObj(`static/img/hertaa${random}.gif`);
-        elem.style.position = 'absolute';
-        elem.style.right = '-500px';
-        elem.style.bottom = '0px'
-        elem.style.zIndex = '-1';
-        elem.style.maxWidth = '100%';
+        elem.className = 'herta'
+        elem.style.animation = `herta ${time - 200}ms ease-in`
         wrapperDom.appendChild(elem);
 
-        let pos = -500;
-        const limit = window.innerWidth + 500;
-        clearInterval(id);
-        id = setInterval(() => {
-            if (pos >= limit) {
-                clearInterval(id);
-                elem.remove()
-            } else {
-                pos += randomSpeed;
-                elem.style.right = pos + 'px';
-            }
-        }, 12);
+        setTimeout(() => {
+            elem.remove()
+            elem = null
+        }, time - 200)
     };
 
     // This function creates ripples on a button click and removes it after 300ms.
