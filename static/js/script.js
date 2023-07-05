@@ -2,10 +2,18 @@ const LANGUAGES = {
     "_": { defaultLanguage: "en", defaultVOLanguage: "ja" },
     "en": {
         audioList: [
-            // TODO audio random weight
-            "audio/en/en_1.mp3",
-            "audio/en/en_2.mp3",
-            "audio/en/en_3.mp3"
+            {
+                src: "audio/en/en_1.mp3",
+                weight: 1
+            },
+            {
+                src: "audio/en/en_2.mp3",
+                weight: 1
+            },
+            {
+                src: "audio/en/en_3.mp3",
+                weight: 1
+            }
         ],
         texts: {
             "page-title": "Welcome to herta kuru~",
@@ -35,11 +43,26 @@ const LANGUAGES = {
         cardImage: "img/card_en.jpg"
     }, "cn": {
         audioList: [
-            "audio/cn/gululu.mp3",
-            "audio/cn/gururu.mp3",
-            "audio/cn/转圈圈.mp3",
-            "audio/cn/转圈圈咯.mp3",
-            "audio/cn/要坏掉了.mp3"
+            {
+                src: "audio/cn/gululu.mp3",
+                weight: 5
+            },
+            {
+                src: "audio/cn/gururu.mp3",
+                weight: 5
+            },
+            {
+                src: "audio/cn/转圈圈.mp3",
+                weight: 5
+            },
+            {
+                src: "audio/cn/转圈圈咯.mp3",
+                weight: 5
+            },
+            {
+                src: "audio/cn/要坏掉了.mp3",
+                weight: 1
+            }
         ],
         texts: {
             "page-title": "黑塔转圈圈",
@@ -71,9 +94,18 @@ const LANGUAGES = {
     },
     "ja": {
         audioList: [
-            "audio/ja/kuruto.mp3",
-            "audio/ja/kuru1.mp3",
-            "audio/ja/kuru2.mp3",
+            {
+                src: "audio/ja/kuruto.mp3",
+                weight: 1
+            },
+            {
+                src: "audio/ja/kuru1.mp3",
+                weight: 1
+            },
+            {
+                src: "audio/ja/kuru2.mp3",
+                weight: 1
+            }
         ],
         texts: {
             "page-title": "ヘルタクルへようこそ~",
@@ -95,10 +127,18 @@ const LANGUAGES = {
     },
     "kr": {
         audioList: [
-            // TODO audio random weight
-            "audio/kr/kr_1.mp3",
-            "audio/kr/kr_2.mp3",
-            "audio/kr/kr_3.mp3"
+            {
+                src: "audio/kr/kr_1.mp3",
+                weight: 1
+            },
+            {
+                src: "audio/kr/kr_2.mp3",
+                weight: 1
+            },
+            {
+                src: "audio/kr/kr_3.mp3",
+                weight: 1
+            }
         ],
         texts: {
             "page-title": "빙글빙글 헤르타에 오신걸 환영합니다~",
@@ -187,23 +227,21 @@ const progress = [0, 1];
                 const audioList = LANGUAGES[lang].audioList;
                 if (Array.isArray(audioList)) {
                     for (let i = 0; i < audioList.length; i++) {
-                        const url = audioList[i];
-                        if (typeof url === "string" && url.endsWith(".mp3")) {
-                            promises.push(
-                                getObjectURL("static/" + url)
-                                    .then(result => LANGUAGES[lang].audioList[i] = result)
-                            );
-                        }
+                        const item = audioList[i];
+                        promises.push(
+                            getObjectURL("static/" + item.src)
+                                .then(result => LANGUAGES[lang].audioList[i].src = result)
+                        );
                     }
                 }
             }
         }
 
         // image
-        const imageList = ["static/img/hertaa1.gif", "static/img/hertaa2.gif"]
+        const imageList = ["img/hertaa1.gif", "img/hertaa2.gif"]
         imageList.forEach(url => {
             promises.push(
-                getObjectURL(url)
+                getObjectURL(`static/${url}`)
                     .then(result => cachedObjects[url] = result)
             )
         })
@@ -351,12 +389,12 @@ const progress = [0, 1];
 
     function getRandomAudioUrl() {
         const localAudioList = getLocalAudioList();
-        if (current_vo_language == "ja") {
-            const randomIndex = Math.floor(Math.random() * 2) + 1;
-            return localAudioList[randomIndex];
-        }
-        const randomIndex = Math.floor(Math.random() * localAudioList.length);
-        return localAudioList[randomIndex];
+        const weights = []
+        localAudioList.forEach((item, index) => {
+            weights.push(item.weight + (weights[index - 1] ?? 0))
+        })
+        const random = Math.random() * weights.at(-1);
+        return localAudioList[weights.findIndex((weight) => weight > random)].src
     }
 
     function playKuru() {
