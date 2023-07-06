@@ -415,7 +415,7 @@ const progress = [0, 1];
         let elem = document.createElement('img');
         elem.src = cacheStaticObj(`static/img/hertaa${random}.gif`);
         elem.className = 'herta'
-        elem.style.animation = `herta ${time - 200}ms ease-in`
+        elem.style.animation = `herta ${time - 200}ms ease-in forwards`
         wrapperDom.appendChild(elem);
 
         setTimeout(() => {
