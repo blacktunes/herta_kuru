@@ -232,7 +232,7 @@ const progress = [0, 1];
 
     // get global counter element and initialize its respective counts
     const localCounter = document.querySelector('#local-counter');
-    let localCount = localStorage.getItem('count-v2') || 0;
+    let localCount = Number(localStorage.getItem('count-v2') || 0);
 
     // display counter
     localCounter.textContent = localCount.toLocaleString('en-US');
@@ -302,7 +302,6 @@ const progress = [0, 1];
             localStorage.setItem('count-v2', localCount);
             triggerRipple(e);
             playKuru();
-            animateHerta();
             refreshDynamicTexts();
         });
     };
@@ -361,36 +360,48 @@ const progress = [0, 1];
         }
         let audio = new Audio();//cacheStaticObj(audioUrl));
         audio.src = audioUrl;
-        audio.play();
+        audio.oncanplay = () => {
+            animateHerta()
+            audio.play()
+        }
         audio.addEventListener("ended", function () {
             this.remove();
         });
     }
 
     function animateHerta() {
-        let id = null;
-        const random = Math.floor(Math.random() * 2) + 1;
-        const elem = document.createElement("img");
-        elem.src = cacheStaticObj(`img/hertaa${random}.gif`);
-        elem.style.position = "absolute";
-        elem.style.right = "-500px";
-        elem.style.top = counterButton.getClientRects()[0].bottom + scrollY - 430 + "px"
-        elem.style.zIndex = "-10";
-        document.body.appendChild(elem);
+        const random = Math.floor(Math.random() * 2) + 1
+        let elem = document.createElement('img')
+        elem.src = cacheStaticObj(`img/hertaa${random}.gif`)
+        elem.style.zIndex = '-10'
+        elem.style.transform = 'translate3d(100%, 0, 0)'
+        elem.style.position = 'absolute'
+        elem.style.right = '0'
+        elem.style.top = counterButton.getClientRects()[0].bottom + scrollY - 430 + 'px'
+        document.body.appendChild(elem)
 
-        let pos = -500;
-        const limit = window.innerWidth + 500;
-        clearInterval(id);
-        id = setInterval(() => {
-            if (pos >= limit) {
-                clearInterval(id);
+        const randomTime = (Math.random() + 0.5) * 1000
+        let lastUpdate = Date.now()
+        let totalTime = 0
+        let position = 0
+        const herta = () => {
+            let current = Date.now()
+            position += (current - lastUpdate) * (100 / randomTime)
+            totalTime += (current - lastUpdate)
+            lastUpdate = current
+            console.log(position)
+            elem.style.right = `${position}%`
+            elem.style.transform = `translate3d(${100 - position}%, 0, 0)`
+            if (totalTime > randomTime) {
                 elem.remove()
-            } else {
-                pos += 20;
-                elem.style.right = pos + 'px';
+                elem = null
+                return
             }
-        }, 12);
-    };
+            requestAnimationFrame(herta)
+        }
+
+        requestAnimationFrame(herta)
+    }
 
     // This function creates ripples on a button click and removes it after 300ms.
     function triggerRipple(e) {
